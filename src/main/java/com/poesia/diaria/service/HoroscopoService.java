@@ -5,7 +5,8 @@ import com.poesia.diaria.repository.HoroscopoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -29,8 +30,15 @@ public class HoroscopoService {
 
 
     public Horoscopo findByDate(Integer dia, Integer mes) {
-        Calendar fecha = null;
-        fecha.set(2000, mes, dia);
+
+        LocalDate fecha;
+        fecha = LocalDate.of(2000, mes, dia);
+
+
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        fecha.format(formato);
+
+        System.out.println(fecha);
         return horoscopoRepository.findByDate(fecha);
     }
 
@@ -40,11 +48,14 @@ public class HoroscopoService {
 
     public Horoscopo update(Horoscopo horoscopo, Integer id) {
         Horoscopo horoscopoAmodificar = horoscopoRepository.getById(id);
-        horoscopoAmodificar = horoscopo;
+        horoscopoAmodificar.setDescripcion(horoscopo.getDescripcion());
+        horoscopoAmodificar.setFechaFinal(horoscopo.getFechaFinal());
+        horoscopoAmodificar.setFechaInicial(horoscopo.getFechaInicial());
+        horoscopoAmodificar.setTipo(horoscopo.getTipo());
         return horoscopoRepository.save(horoscopoAmodificar);
     }
 
-        public void delete( Integer id) {
+    public void delete(Integer id) {
         Horoscopo horoscopoAeliminar = horoscopoRepository.getById(id);
         horoscopoRepository.delete(horoscopoAeliminar);
     }
