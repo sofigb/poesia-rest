@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 
 @Repository
 public interface HoroscopoRepository extends JpaRepository<Horoscopo, Integer> {
@@ -15,6 +15,6 @@ public interface HoroscopoRepository extends JpaRepository<Horoscopo, Integer> {
     Horoscopo findByTipo(@Param("tipo")String tipo);
 
 
-    @Query(value = "SELECT * FROM horoscopo WHERE horoscopo.fechaInicial >= :fecha AND horoscopo.fechaFinal <= :fecha", nativeQuery = true)
-    Horoscopo findByDate(@Param("fecha") Calendar fecha);
+    @Query(value = "SELECT * FROM horoscopo WHERE horoscopo.fecha_inicial<= :fecha AND horoscopo.fecha_final>= :fecha", nativeQuery = true)
+    Horoscopo findByDate(@Param("fecha") LocalDate fecha);
 }
