@@ -7,7 +7,7 @@ import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
-public class DTOFecha {
+public class FechaDTO {
 
 
     @NotEmpty(message = "El mes es obligatorio")

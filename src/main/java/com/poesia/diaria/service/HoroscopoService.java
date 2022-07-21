@@ -1,7 +1,9 @@
 package com.poesia.diaria.service;
 
 import com.poesia.diaria.exception.MyException;
+import com.poesia.diaria.model.DTO.HoroscopoResponseDTO;
 import com.poesia.diaria.model.Horoscopo;
+import com.poesia.diaria.model.mapper.HoroscopoMapper;
 import com.poesia.diaria.repository.HoroscopoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,42 +16,49 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class HoroscopoService {
+public class
+HoroscopoService {
 
 
     @Autowired
     private HoroscopoRepository horoscopoRepository;
 
-    public List<Horoscopo> findAll() throws MyException {
+
+    public List<HoroscopoResponseDTO> findAll() throws MyException {
         try {
-            return horoscopoRepository.findAll();
+            return HoroscopoMapper.init.horoscopoListAResponseDTOList(horoscopoRepository.findAll());
+
         } catch (Exception e) {
             throw new MyException("No se ha podido conectar con la BBDD", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public Horoscopo findByTipo(String tipo) throws MyException {
+    public HoroscopoResponseDTO findByTipo(String tipo) throws MyException {
         if (horoscopoRepository.findByTipo(tipo) == null) {
             throw new MyException("No existe el tipo : " + tipo, HttpStatus.NOT_FOUND);
         }
-        return horoscopoRepository.findByTipo(tipo);
+        return HoroscopoMapper.init.horoscopoToHoroscopoResponseDTO(horoscopoRepository.findByTipo(tipo));
+
     }
 
-    public Horoscopo findById(Integer id) throws MyException {
+    public HoroscopoResponseDTO findById(Integer id) throws MyException {
         try {
-            return horoscopoRepository.findById(id).orElseThrow();
+            return HoroscopoMapper.init.horoscopoToHoroscopoResponseDTO(horoscopoRepository.findById(id).orElseThrow());
         } catch (NoSuchElementException e) {
             throw new MyException("No se ha encontrado horóscopo con  el id: " + id, HttpStatus.NOT_FOUND);
         }
     }
 
 
-    public Horoscopo findByDate(Integer dia, Integer mes) throws MyException {
+    public HoroscopoResponseDTO findByDate(Integer dia, Integer mes) throws MyException {
         try {
             LocalDate fecha;
-            fecha = LocalDate.of(2000, mes, dia);
+            Integer year=2000;
+            if (mes==1 || mes==2){
+                year=2001;
+            }
 
-
+            fecha = LocalDate.of(year, mes, dia);
             DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             fecha.format(formato);
 
@@ -57,7 +66,7 @@ public class HoroscopoService {
             if (horoscopoRepository.findByDate(fecha) == null) {
                 throw new MyException("No existe un horoscopo con dichas fechas ", HttpStatus.NOT_FOUND);
             }
-            return horoscopoRepository.findByDate(fecha);
+            return HoroscopoMapper.init.horoscopoToHoroscopoResponseDTO(horoscopoRepository.findByDate(fecha));
         } catch (DateTimeException e) {
             throw new MyException("El mes y el dia ingresado no son validos ", HttpStatus.BAD_REQUEST);
 
@@ -65,22 +74,22 @@ public class HoroscopoService {
 
     }
 
-    public Horoscopo save(Horoscopo horoscopo) throws MyException {
+    public HoroscopoResponseDTO save(Horoscopo horoscopo) throws MyException {
         try {
-            return horoscopoRepository.save(horoscopo);
+            return HoroscopoMapper.init.horoscopoToHoroscopoResponseDTO( horoscopoRepository.save(horoscopo));
         } catch (Exception e) {
             throw new MyException("No se ha guardar el horoscopo seleccionada", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public Horoscopo update(Horoscopo horoscopo, Integer id) throws MyException {
+    public HoroscopoResponseDTO update(Horoscopo horoscopo, Integer id) throws MyException {
         try {
             Horoscopo horoscopoAmodificar = horoscopoRepository.findById(id).orElseThrow();
             horoscopoAmodificar.setDescripcion(horoscopo.getDescripcion());
             horoscopoAmodificar.setFechaFinal(horoscopo.getFechaFinal());
             horoscopoAmodificar.setFechaInicial(horoscopo.getFechaInicial());
             horoscopoAmodificar.setTipo(horoscopo.getTipo());
-            return horoscopoRepository.save(horoscopoAmodificar);
+            return HoroscopoMapper.init.horoscopoToHoroscopoResponseDTO( horoscopoRepository.save(horoscopoAmodificar));
         } catch (NoSuchElementException e) {
             throw new MyException("No se ha encontrado horóscopo con el id: " + id, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
