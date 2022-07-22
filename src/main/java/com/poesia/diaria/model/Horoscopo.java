@@ -30,4 +30,7 @@ public class Horoscopo {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd",iso = DateTimeFormat.ISO.DATE)
     private Calendar fechaFinal;
+
+
+    private String nombreCoctel;
 }

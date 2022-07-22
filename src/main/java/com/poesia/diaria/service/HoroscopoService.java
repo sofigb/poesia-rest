@@ -2,8 +2,10 @@ package com.poesia.diaria.service;
 
 import com.poesia.diaria.exception.MyException;
 import com.poesia.diaria.model.DTO.HoroscopoResponseDTO;
+import com.poesia.diaria.model.DTO.HoroscopoResponseDTOconCoctel;
 import com.poesia.diaria.model.Horoscopo;
 import com.poesia.diaria.model.mapper.HoroscopoMapper;
+import com.poesia.diaria.repository.CoctelRepository;
 import com.poesia.diaria.repository.HoroscopoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,13 +18,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-public class
-HoroscopoService {
+public class HoroscopoService {
 
 
     @Autowired
     private HoroscopoRepository horoscopoRepository;
 
+    @Autowired
+    private CoctelRepository coctelRepository;
 
     public List<HoroscopoResponseDTO> findAll() throws MyException {
         try {
@@ -50,7 +53,7 @@ HoroscopoService {
     }
 
 
-    public HoroscopoResponseDTO findByDate(Integer dia, Integer mes) throws MyException {
+    public HoroscopoResponseDTOconCoctel findByDate(Integer dia, Integer mes) throws MyException {
         try {
             LocalDate fecha;
             Integer year=2000;
@@ -66,7 +69,9 @@ HoroscopoService {
             if (horoscopoRepository.findByDate(fecha) == null) {
                 throw new MyException("No existe un horoscopo con dichas fechas ", HttpStatus.NOT_FOUND);
             }
-            return HoroscopoMapper.init.horoscopoToHoroscopoResponseDTO(horoscopoRepository.findByDate(fecha));
+            Horoscopo horoscopoNuevo=horoscopoRepository.findByDate(fecha);
+            horoscopoNuevo.setNombreCoctel(setCoctel());
+            return HoroscopoMapper.init.horoscopoToHoroscopoResponseDTOCoctel(horoscopoNuevo);
         } catch (DateTimeException e) {
             throw new MyException("El mes y el dia ingresado no son validos ", HttpStatus.BAD_REQUEST);
 
@@ -108,5 +113,22 @@ HoroscopoService {
             throw new MyException("No se ha podido eliminar el horoscopo seleccionada", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+
+    public String setCoctel() {
+
+        String resultado= coctelRepository.obtenerCoctelRandom();
+
+
+        String nombreCoctel =resultado.substring((resultado.indexOf("\"strDrink\":",0))+11,resultado.indexOf("strDrinkAlternate",0));
+        String foto =resultado.substring((resultado.indexOf("\"strDrinkThumb\":",0))+16,resultado.indexOf("strIngredient1",0));
+        //coctel.setNombre();
+
+
+        System.out.println("!!!!!!!!!!!!!FOTOO!!!!!!!!!!!!");
+        System.out.println( foto.substring(0,foto.indexOf(",",0)));
+        //coctel.setStrDrinkThumb(foto.substring(0,foto.indexOf(",",0)));
+        return nombreCoctel.substring(0,nombreCoctel.indexOf(",",0));
     }
 }

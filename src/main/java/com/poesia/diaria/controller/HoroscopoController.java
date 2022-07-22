@@ -3,14 +3,15 @@ package com.poesia.diaria.controller;
 import com.poesia.diaria.exception.MyException;
 import com.poesia.diaria.model.DTO.FechaDTO;
 import com.poesia.diaria.model.DTO.HoroscopoResponseDTO;
+import com.poesia.diaria.model.DTO.HoroscopoResponseDTOconCoctel;
 import com.poesia.diaria.model.Horoscopo;
+import com.poesia.diaria.repository.CoctelRepository;
 import com.poesia.diaria.service.HoroscopoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -23,8 +24,11 @@ public class HoroscopoController {
     @Autowired
     private HoroscopoService horoscopoService;
 
+
+
     @GetMapping
     public ResponseEntity<List<HoroscopoResponseDTO>> findAll() throws MyException {
+
         return ResponseEntity.ok(horoscopoService.findAll());
     }
 
@@ -50,7 +54,7 @@ public class HoroscopoController {
     }
 
     @GetMapping("/fecha")
-    public ResponseEntity<HoroscopoResponseDTO> findByDate(@RequestBody FechaDTO dtoFecha) throws ParseException, MyException {
+    public ResponseEntity<HoroscopoResponseDTOconCoctel> findByDate(@RequestBody FechaDTO dtoFecha) throws  MyException {
         return ResponseEntity.status(HttpStatus.OK).body(horoscopoService.findByDate(dtoFecha.getDia(), dtoFecha.getMes()));
     }
 }
